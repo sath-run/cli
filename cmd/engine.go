@@ -33,33 +33,50 @@ func sendRequestToEngine(method string, path string, data map[string]interface{}
 
 	if len(body) == 0 {
 	} else if err := json.Unmarshal(body, &result); err != nil {
-		log.Fatal(err)
+		result = map[string]interface{}{
+			"message": string(body),
+		}
 	}
 
 	return result, resp.StatusCode
 }
 
 func EngineGet(path string) map[string]interface{} {
-	res, _ := sendRequestToEngine(http.MethodGet, path, nil)
+	res, code := sendRequestToEngine(http.MethodGet, path, nil)
+	if code < 200 || code >= 400 {
+		log.Fatal(res, code)
+	}
 	return res
 }
 
 func EnginePost(path string, data map[string]interface{}) map[string]interface{} {
-	res, _ := sendRequestToEngine(http.MethodPost, path, data)
+	res, code := sendRequestToEngine(http.MethodPost, path, data)
+	if code < 200 || code >= 400 {
+		log.Fatal(res, code)
+	}
 	return res
 }
 
 func EnginePut(path string, data map[string]interface{}) map[string]interface{} {
-	res, _ := sendRequestToEngine(http.MethodPut, path, data)
+	res, code := sendRequestToEngine(http.MethodPut, path, data)
+	if code < 200 || code >= 400 {
+		log.Fatal(res, code)
+	}
 	return res
 }
 
 func EnginePatch(path string, data map[string]interface{}) map[string]interface{} {
-	res, _ := sendRequestToEngine(http.MethodPatch, path, data)
+	res, code := sendRequestToEngine(http.MethodPatch, path, data)
+	if code < 200 || code >= 400 {
+		log.Fatal(res, code)
+	}
 	return res
 }
 
 func EngineDelete(path string, data map[string]interface{}) map[string]interface{} {
-	res, _ := sendRequestToEngine(http.MethodDelete, path, data)
+	res, code := sendRequestToEngine(http.MethodDelete, path, data)
+	if code < 200 || code >= 400 {
+		log.Fatal(res, code)
+	}
 	return res
 }
