@@ -10,7 +10,7 @@ import (
 
 var origin string = "http://localhost:33566"
 
-func sendRequestToEngine(method string, path string, data map[string]interface{}) map[string]interface{} {
+func sendRequestToEngine(method string, path string, data map[string]interface{}) (map[string]interface{}, int) {
 	url := origin + path
 	buffer := new(bytes.Buffer)
 	json.NewEncoder(buffer).Encode(data)
@@ -18,6 +18,7 @@ func sendRequestToEngine(method string, path string, data map[string]interface{}
 	if err != nil {
 		log.Fatal(err)
 	}
+	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -29,35 +30,36 @@ func sendRequestToEngine(method string, path string, data map[string]interface{}
 		log.Fatal(err)
 	}
 	var result map[string]interface{}
+
 	if len(body) == 0 {
-		return nil
 	} else if err := json.Unmarshal(body, &result); err != nil {
 		log.Fatal(err)
 	}
-	if resp.StatusCode >= 200 && resp.StatusCode < 400 {
-		// nothing to do
-	} else {
-		log.Fatal(resp.StatusCode, resp.Status, result)
-	}
-	return result
+
+	return result, resp.StatusCode
 }
 
 func EngineGet(path string) map[string]interface{} {
-	return sendRequestToEngine(http.MethodGet, path, nil)
+	res, _ := sendRequestToEngine(http.MethodGet, path, nil)
+	return res
 }
 
 func EnginePost(path string, data map[string]interface{}) map[string]interface{} {
-	return sendRequestToEngine(http.MethodPost, path, data)
+	res, _ := sendRequestToEngine(http.MethodPost, path, data)
+	return res
 }
 
 func EnginePut(path string, data map[string]interface{}) map[string]interface{} {
-	return sendRequestToEngine(http.MethodPut, path, data)
+	res, _ := sendRequestToEngine(http.MethodPut, path, data)
+	return res
 }
 
 func EnginePatch(path string, data map[string]interface{}) map[string]interface{} {
-	return sendRequestToEngine(http.MethodPatch, path, data)
+	res, _ := sendRequestToEngine(http.MethodPatch, path, data)
+	return res
 }
 
 func EngineDelete(path string, data map[string]interface{}) map[string]interface{} {
-	return sendRequestToEngine(http.MethodDelete, path, data)
+	res, _ := sendRequestToEngine(http.MethodDelete, path, data)
+	return res
 }
