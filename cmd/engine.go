@@ -3,9 +3,13 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"syscall"
 )
 
 var origin string = "http://localhost:33566"
@@ -18,9 +22,15 @@ func sendRequestToEngine(method string, path string, data map[string]interface{}
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
+	if errors.Is(err, syscall.ECONNREFUSED) {
+		fmt.Println("SATH engine is not running.")
+		fmt.Println("If sath-engine is installed, run the following command to start:")
+		fmt.Println("  sudo systemctl start sath")
+		os.Exit(1)
+	} else if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
