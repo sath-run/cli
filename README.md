@@ -19,16 +19,20 @@ sudo systemctl start sath
 Run sath command:
 
 ```text
+A CLI tool to run algorithm for SATH platform in your local machine,
+Complete documentation is available at https://github.com/sath-run/cli
+
 Usage:
   sath [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
   help        Help about any command
+  jobs        List jobs
   login       Login
   logout      logout
   start       Start SATH engine
-  status      Get job status
+  status      Get sath engine status
   stop        Stop SATH engine
 
 Flags:

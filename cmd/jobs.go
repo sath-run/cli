@@ -21,14 +21,9 @@ import (
 // jobsCmd represents the jobs command
 var jobsCmd = &cobra.Command{
 	Use:   "jobs",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: runJobs,
+	Short: "List jobs",
+	Long:  `List SATH engine jobs`,
+	Run:   runJobs,
 }
 
 type JobStatusResult struct {
@@ -115,7 +110,7 @@ func runJobs(cmd *cobra.Command, args []string) {
 }
 
 func printJobs(result JobStatusResult) {
-	fmt.Printf("%-10s %-10s %-10s %-30s %-16s %-16s %-16s\n",
+	fmt.Printf("%-10s %-14s %-10s %-30s %-16s %-16s %-16s\n",
 		"JOB ID", "STATUS", "PROGRESS", "IMAGE", "CONTAINER ID", "CREATED", "COMPLETED")
 	for _, job := range result.Jobs {
 		createdAt := time.Unix(job.CreatedAt, 0)
@@ -130,7 +125,7 @@ func printJobs(result JobStatusResult) {
 		if len(containerId) > 12 {
 			containerId = containerId[:12]
 		}
-		fmt.Printf("%-10s %-10s %-10.2f %-30s %-16s %-16s %-16s\n",
+		fmt.Printf("%-10s %-14s %-10.2f %-30s %-16s %-16s %-16s\n",
 			job.Id, job.Status, job.Progress, image, containerId,
 			created,
 			completed,
