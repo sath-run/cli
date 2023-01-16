@@ -2,15 +2,13 @@
 
 ## Installation
 
-1. Install [docker](https://docs.docker.com/engine/install/)
-
-2. Install sath-engine and sath-cli:
-
 ```bash
 wget https://download.sath.run/linux/sath.run && sudo bash sath.run
 ```
 
 ## Usage
+
+Install and start [docker](https://docs.docker.com/engine/install/)
 
 Start sath-engine by:
 
