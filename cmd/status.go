@@ -4,12 +4,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"bufio"
-	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -17,51 +12,40 @@ import (
 // statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Get job status",
-	Long:  `Get current job status`,
+	Short: "Get sath engine status",
+	Long:  `Get sath engine status`,
 	Run:   runStatus,
 }
 
 func printStatusResult(result map[string]interface{}) {
-	if result == nil {
-		fmt.Println("no job is running")
-	} else {
-		fmt.Printf("id: %s\n", result["id"])
-		fmt.Printf("status: %s\n", result["status"])
-		fmt.Printf("progress: %f\n", result["progress"])
-		fmt.Printf("message: %s\n", result["message"])
-		fmt.Println()
+	fmt.Println("SATH Version:", result["version"])
+	var status string = result["status"].(string)
+	switch status {
+	case "WAITING":
+		fmt.Println("SATH Engine is waiting")
+		fmt.Println("  use: `sath start` to start it")
+	case "UNINITIALIZED", "STARTING":
+		fmt.Println("SATH Engine is starting, it may take a few seconds")
+	case "RUNNING":
+		fmt.Println("SATH Engine is running")
+		fmt.Println("  Use: `sath jobs` to view the current running jobs")
+	case "UNKNOWN":
+		fmt.Println("unknown status, please contact service@sath.run for support")
 	}
+	// if result == nil {
+	// 	fmt.Println("no job is running")
+	// } else {
+	// 	fmt.Printf("id: %s\n", result["id"])
+	// 	fmt.Printf("status: %s\n", result["status"])
+	// 	fmt.Printf("progress: %f\n", result["progress"])
+	// 	fmt.Printf("message: %s\n", result["message"])
+	// 	fmt.Println()
+	// }
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
-	follow, err := cmd.Flags().GetBool("follow")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if follow {
-		resp, err := http.Get(origin + "/jobs/current/stream")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-		scanner := bufio.NewScanner(resp.Body)
-		for scanner.Scan() {
-			response := scanner.Text()
-			if strings.HasPrefix(response, "data:") {
-				response = strings.TrimPrefix(response, "data:")
-				var result map[string]interface{}
-				if err := json.Unmarshal([]byte(response), &result); err != nil {
-					log.Fatal(err)
-				}
-				printStatusResult(result)
-			}
-		}
-	} else {
-		result := EngineGet("/jobs/current")
-		printStatusResult(result)
-	}
-
+	result := EngineGet("/services/status")
+	printStatusResult(result)
 }
 
 func init() {
@@ -75,5 +59,4 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	statusCmd.Flags().BoolP("follow", "f", false, "This option cause sath to stream status")
 }
