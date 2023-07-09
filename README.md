@@ -3,12 +3,17 @@
 ## Installation
 
 ```bash
-wget https://download.sath.run/linux/sath.run && sudo bash sath.run
+rm -rf /usr/local/sath; wget https://download.sath.run/linux/sath.run && sudo bash sath.run
 ```
 
 ## Usage
 
 Install and start [docker](https://docs.docker.com/engine/install/)
+
+If systemctl is not supported by your system, you need to bump it up manually by
+```bash
+sudo sath-engine &
+```
 
 Start sath-engine by:
 
