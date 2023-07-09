@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +21,11 @@ and will no longer start new jobs`,
 }
 
 func runStop(cmd *cobra.Command, args []string) {
-	resp := EnginePost("/services/stop", nil)
+	wait, err := cmd.Flags().GetBool("wait")
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp := EnginePost("/services/stop", map[string]interface{}{"wait": wait})
 	fmt.Println(resp["message"])
 }
 
@@ -36,4 +41,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// stopCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	stopCmd.Flags().BoolP("wait", "w", false, "Wait for job completion before exit")
 }

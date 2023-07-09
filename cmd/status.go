@@ -28,8 +28,20 @@ func printStatusResult(result map[string]interface{}) {
 		fmt.Println("SATH Engine is starting, it may take a few seconds")
 	case "RUNNING":
 		fmt.Println("SATH Engine is running")
-		fmt.Println("  Use: `sath jobs` to view the current running jobs")
-	case "UNKNOWN":
+		if jobs, ok := result["jobs"].([]interface{}); ok {
+			fmt.Println("Current running jobs:")
+			fmt.Println("*****************************************")
+			for _, j := range jobs {
+				if job, ok := j.(map[string]any); ok {
+					fmt.Println("  ", job["execId"])
+				}
+			}
+			fmt.Println("*****************************************")
+			fmt.Println("Use: `sath jobs` to view detail of jobs")
+		} else {
+			fmt.Println("No job is accpeted yet")
+		}
+	default:
 		fmt.Println("unknown status, please contact service@sath.run for support")
 	}
 	// if result == nil {

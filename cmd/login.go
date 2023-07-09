@@ -27,10 +27,20 @@ var loginCmd = &cobra.Command{
 func runLogin(cmd *cobra.Command, args []string) {
 	reader := bufio.NewReader(os.Stdin)
 	var err error
-	var username, password string
-
+	org, err := cmd.Flags().GetString("org")
+	if err != nil {
+		log.Fatal(err)
+	}
+	username, err := cmd.Flags().GetString("username")
+	if err != nil {
+		log.Fatal(err)
+	}
+	password, err := cmd.Flags().GetString("password")
+	if err != nil {
+		log.Fatal(err)
+	}
 	for len(username) == 0 {
-		fmt.Print("Enter Email: ")
+		fmt.Print("Enter Username: ")
 		username, err = reader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err)
@@ -38,7 +48,6 @@ func runLogin(cmd *cobra.Command, args []string) {
 			username = strings.Trim(username, "\n")
 		}
 	}
-
 	for len(password) == 0 {
 		fmt.Print("Enter Password: ")
 		bytePassword, err := term.ReadPassword(int(syscall.Stdin))
@@ -49,10 +58,10 @@ func runLogin(cmd *cobra.Command, args []string) {
 		password = string(bytePassword)
 		fmt.Println("")
 	}
-
 	res, status := sendRequestToEngine(http.MethodPost, "/users/login", map[string]interface{}{
-		"email":    username,
-		"password": password,
+		"Username":     username,
+		"Password":     password,
+		"Organization": org,
 	})
 	if status == http.StatusOK {
 		fmt.Println("login success")
@@ -80,4 +89,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// loginCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	loginCmd.Flags().String("org", "", "Organization name")
+	loginCmd.Flags().String("username", "", "Username")
+	loginCmd.Flags().String("password", "", "Password")
 }

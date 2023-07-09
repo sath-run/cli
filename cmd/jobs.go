@@ -113,9 +113,16 @@ func printJobs(result JobStatusResult) {
 	fmt.Printf("%-10s %-14s %-10s %-30s %-16s %-16s %-16s\n",
 		"JOB ID", "STATUS", "PROGRESS", "IMAGE", "CONTAINER ID", "CREATED", "COMPLETED")
 	for _, job := range result.Jobs {
+		jobId := job.Id
+		if len(jobId) > 10 {
+			jobId = jobId[2:10]
+		}
 		createdAt := time.Unix(job.CreatedAt, 0)
 		completedAt := time.Unix(job.CompletedAt, 0)
 		image := strings.Split(job.Image, "@")[0]
+		if len(image) > 28 {
+			image = image[:25] + "..."
+		}
 		created := fmtDuration(time.Since(createdAt)) + " ago"
 		completed := ""
 		if !completedAt.IsZero() {
@@ -125,8 +132,10 @@ func printJobs(result JobStatusResult) {
 		if len(containerId) > 12 {
 			containerId = containerId[:12]
 		}
-		fmt.Printf("%-10s %-14s %-10.2f %-30s %-16s %-16s %-16s\n",
-			job.Id, job.Status, job.Progress, image, containerId,
+		fmt.Printf("%-10s %-14s %-10s %-30s %-16s %-16s %-16s\n",
+			jobId, job.Status,
+			fmt.Sprintf("%.2f%%", job.Progress),
+			image, containerId,
 			created,
 			completed,
 		)
