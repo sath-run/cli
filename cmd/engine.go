@@ -2,17 +2,19 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"syscall"
 )
 
-var origin string = "http://localhost:33566"
+var origin string = "http://unix"
 
 func sendRequestToEngine(method string, path string, data map[string]interface{}) (map[string]interface{}, int) {
 	url := origin + path
@@ -23,8 +25,16 @@ func sendRequestToEngine(method string, path string, data map[string]interface{}
 		log.Fatal(err)
 	}
 
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", "/var/run/sathcli.sock")
+			},
+		},
+	}
+
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if errors.Is(err, syscall.ECONNREFUSED) {
 		fmt.Println("SATH engine is not running.")
 		fmt.Println("If sath-engine is installed, run the following command to start:")
